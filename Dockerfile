@@ -1,4 +1,4 @@
-FROM ubuntu:stable
+FROM ubuntu:latest
 
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
