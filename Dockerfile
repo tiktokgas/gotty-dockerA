@@ -13,17 +13,8 @@ RUN apt-get -y update && \
         cabextract \
         git \
         gnupg \
-        gosu \
-        gpg-agent \
-        locales \
-        p7zip \
-        pulseaudio \
-        pulseaudio-utils \
         sudo \
-        tzdata \
         unzip \
-        wget \
-        winbind \
         xvfb \
         zenity \
     && curl -sLk https://github.com/yudai/gotty/releases/download/${GOTTY_TAG_VER}/gotty_linux_amd64.tar.gz \
